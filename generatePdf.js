@@ -1,7 +1,12 @@
 const puppeteer = require('puppeteer');
+require('dotenv').config();
 
 const generatePdf = async (res) => {
-	const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+	const browser = await puppeteer.launch({
+		headless: true,
+		args: ['--no-sandbox'],
+		executablePath: process.env.NODE_ENV === 'production' ? proccess.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
+	});
 	const page = await browser.newPage();
 
 	try {
@@ -25,11 +30,11 @@ const generatePdf = async (res) => {
 			.catch(async (error) => {
 				await browser.close();
 				res.send(error);
-                return;
+				return;
 			});
 	} catch (error) {
-        res.send(error);
-        return;
+		res.send(error);
+		return;
 	}
 };
 
