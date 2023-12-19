@@ -10,10 +10,11 @@ exports.pdf = onRequest(async (req, res) => {
 	if (!data) return res.status(400).send('data is required');
 
 	await generatePdf
-		.generate(body)
+		.generate(data)
 		.then((pdfBuffer) => {
 			res.setHeader('Content-Type', 'application/pdf');
 			res.setHeader('Content-Disposition', `attachment; filename=${filename}.pdf`);
+			res.setHeader('Content-Disposition', `attachment; filename=filename.pdf`);
 			res.status(200);
 			res.send(pdfBuffer);
 		})
