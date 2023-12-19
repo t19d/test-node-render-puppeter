@@ -1,14 +1,7 @@
 /* eslint-disable new-cap */
 const pdfkit = require('pdfkit');
 
-const generate = async (res) => {
-	// const data = req.body; // Los datos recibidos en el body
-	const data = {
-		patata: 'cocinada',
-		tortilla: 'con cebolla',
-		emoji: '💩',
-	};
-
+const generate = async (data) => {
 	// Lógica para generar el PDF con los datos
 	const pdfDoc = new pdfkit();
 	pdfDoc.text(JSON.stringify(data));
