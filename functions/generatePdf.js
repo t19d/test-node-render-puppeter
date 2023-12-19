@@ -1,23 +1,39 @@
-const puppeteer = require('puppeteer');
+/* eslint-disable new-cap */
+const pdfkit = require('pdfkit');
 
-const generate = async () => {
-	// await puppeteer.createBrowserFetcher().download(puppeteer.PUPPETEER_REVISIONS.chromium);
+const generate = async (res) => {
+	// const data = req.body; // Los datos recibidos en el body
+	const data = {
+		patata: 'cocinada',
+		tortilla: 'con cebolla',
+		emoji: '💩',
+	};
 
-	const browser = await puppeteer.launch({
-		headless: true,
-		args: ['--no-sandbox'],
+	// Lógica para generar el PDF con los datos
+	const pdfDoc = new pdfkit();
+	pdfDoc.text(JSON.stringify(data));
+
+	// Convierte el PDF a un Buffer
+	const pdfBuffer = await new Promise((resolve, reject) => {
+		const chunks = [];
+
+		pdfDoc.on('data', (chunk) => {
+			chunks.push(chunk);
+		});
+
+		pdfDoc.on('end', () => {
+			resolve(Buffer.concat(chunks));
+		});
+
+		pdfDoc.on('error', (error) => {
+			reject(error);
+		});
+
+		pdfDoc.end(); // Finaliza la generación del PDF
 	});
-	const page = await browser.newPage();
 
-	await page.setContent('<p>hola patata</p>', {
-		waitUntil: 'domcontentloaded',
-	});
-
-	await page.emulateMediaType('screen');
-	const file = await page.pdf({ format: 'A4' });
-	await browser.close();
-
-	return file;
+	// Devuelve el PDF como respuesta
+	return pdfBuffer;
 };
 
 module.exports = {
