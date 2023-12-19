@@ -1,2 +1,4 @@
-/node_modules
-/resume.pdf
+*node_modules
+.firebaserc
+*firebase.json
+*.eslintrc.js
