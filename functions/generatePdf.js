@@ -1,23 +1,61 @@
 /* eslint-disable new-cap */
-const pdfkit = require('pdfkit');
+// const pdfkit = require('pdfkit');
 const ejs = require('ejs');
+const PDFDocument = require('pdfkit');
+
+const templateChat = `<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Mensajes</title>
+  <style type="text/css">
+    * {
+      font-size: 10px;
+      font-family: Arial, sans-serif;
+
+      box-sizing: border-box;
+      margin: 0
+    }
+
+    body.container {
+      min-width: 100%;
+      padding: 30px;
+    }
+
+    .message{
+      border: 1px solid black;
+      margin: -0.5px;
+      padding: 5px;
+      display: grid;
+      grid-template-columns: 0.2fr 5fr 1fr;
+      gap: 1rem;
+    }
+  </style>
+
+</head>
+
+<body class="container">
+  <section>
+    <% messages.forEach(function(message) { %>
+        <div class="message">
+          <p><%= message.number %></p>
+          <p>Mensaje: <%= message.message %></p>
+          <p>Autor: <%= message.authorName %></p>
+        </div>
+      <% }); %>
+  </section>
+</body>
+
+</html>
+`;
 
 const generate = async (data) => {
-	// Define la plantilla EJS directamente en el código
-	const templateContent = `
-		<%- data.patata %> - <%- data.tortilla %> - <%- data.emoji %> - <%- data.holi %>
-	`;
-
 	// Renderiza la plantilla con los datos
-	const renderedContent = ejs.render(templateContent, { data });
+	const renderedContent = ejs.render(templateChat, data);
 
 	// Lógica para generar el PDF con los datos
-	const pdfDoc = new pdfkit();
+	const pdfDoc = new PDFDocument();
 	pdfDoc.text(renderedContent);
-
-	// Añade una imagen al PDF
-	const imagePath = `data:image/jpeg;base64,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`;
-	pdfDoc.image(imagePath, { width: 200 }); // Ajusta el ancho según tus necesidades
 
 	// Convierte el PDF a un Buffer
 	const pdfBuffer = await new Promise((resolve, reject) => {
@@ -41,6 +79,73 @@ const generate = async (data) => {
 	// Devuelve el PDF como respuesta
 	return pdfBuffer;
 };
+
+generate({
+	patata: 'cocinada',
+	emoji: '💩',
+	tortilla: 'con cebolla',
+	holi: 'lowi',
+	a: 'b',
+	messages: [
+		{
+			number: 1,
+			message: 'Hola, ¿cómo estás?',
+			authorName: 'Usuario 1',
+		},
+		{
+			number: 2,
+			message: '¡Hola! Estoy bien, ¿y tú?',
+			authorName: 'Usuario 2',
+		},
+		{
+			number: 3,
+			message: 'Todo bien, gracias.',
+			authorName: 'Usuario 1',
+		},
+		{
+			number: 4,
+			message: '¿Qué has estado haciendo?',
+			authorName: 'Usuario 2',
+		},
+		{
+			number: 5,
+			message: 'Trabajando en algunos proyectos.',
+			authorName: 'Usuario 1',
+		},
+		{
+			number: 6,
+			message: 'Eso suena genial. ¿En qué estás trabajando?',
+			authorName: 'Usuario 2',
+		},
+		{
+			number: 7,
+			message: 'Principalmente en desarrollo web.',
+			authorName: 'Usuario 1',
+		},
+		{
+			number: 8,
+			message: 'Interesante. ¿Algo emocionante que compartir?',
+			authorName: 'Usuario 2',
+		},
+		{
+			number: 9,
+			message: 'Sí, acabo de lanzar mi propio sitio web.',
+			authorName: 'Usuario 1',
+		},
+		{
+			number: 10,
+			message: '¡Eso es asombroso! ¿Cuál es la URL?',
+			authorName: 'Usuario 2',
+		},
+		{
+			number: 11,
+			message: 'www.ejemplo.com',
+			authorName: 'Usuario 1',
+		},
+	],
+}).then((pdfBuffer) => {
+	console.log(pdfBuffer);
+});
 
 module.exports = {
 	generate,
