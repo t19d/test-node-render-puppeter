@@ -7,7 +7,8 @@
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "gcp-build": "node node_modules/puppeteer/install.js"
   },
   "engines": {
     "node": "18"
@@ -19,9 +20,7 @@
     "firebase-functions": "^4.3.1",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.14.0",
-    "playwright": "^1.40.1",
-    "playwright-core": "^1.40.1",
-    "puppeteer": "^19.7.5"
+    "puppeteer": "^19.2.2"
   },
   "devDependencies": {
     "eslint": "^8.15.0",
